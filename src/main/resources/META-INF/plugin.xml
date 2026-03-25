@@ -1,0 +1,108 @@
+<idea-plugin>
+    <id>com.streamify.shotify</id>
+    <name>Shotify</name>
+    <version>1.0.0</version>
+    <vendor>item</vendor>
+
+    <description>Record Android screens and take screenshots from Android Studio via ADB. Upload instantly to Cloudinary or catbox.moe and get a shareable URL copied to your clipboard. Perfect for sharing bugs or UI captures with your team without leaving the IDE.</description>
+
+    <change-notes><![CDATA[
+        <b>1.1.0</b> — Replace 0x0.st with catbox.moe (0x0.st disabled uploads)
+        <ul>
+            <li>Switched anonymous upload service from 0x0.st to catbox.moe</li>
+        </ul>
+        <b>1.0.0</b> — Initial release
+        <ul>
+            <li>ADB screen recording</li>
+            <li>ADB screenshot capture</li>
+            <li>Cloudinary and 0x0.st upload support</li>
+            <li>Keyboard shortcuts: Ctrl+Shift+R / T / S</li>
+        </ul>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- ─── Extensions ────────────────────────────────────────────────────── -->
+    <extensions defaultExtensionNs="com.intellij">
+
+        <!-- Main Tool Window -->
+        <toolWindow
+                id="Shotify"
+                anchor="bottom"
+                secondary="false"
+                icon="/icons/shotify.svg"
+                factoryClass="com.streamify.shotify.ui.MediaToolWindowFactory"
+                canCloseContents="false"/>
+
+        <!-- Application-level persistent settings -->
+        <applicationService
+                serviceImplementation="com.streamify.shotify.settings.UploadServiceSettings"/>
+
+        <!-- Settings > Tools > Shotify entry -->
+        <projectConfigurable
+                parentId="tools"
+                instance="com.streamify.shotify.settings.UploadServiceConfigurable"
+                id="com.streamify.shotify.settings.UploadServiceConfigurable"
+                displayName="Shotify"/>
+
+        <!-- Notification group -->
+        <notificationGroup
+                id="Shotify"
+                displayType="BALLOON"
+                isLogByDefault="true"
+                toolWindowId="Shotify"/>
+
+    </extensions>
+
+    <!-- ─── Actions ───────────────────────────────────────────────────────── -->
+    <actions>
+
+        <!-- Group in Tools menu -->
+        <group
+                id="Shotify.ActionGroup"
+                text="Shotify"
+                description="Android screen recording and screenshots"
+                popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
+
+        <!-- Start Recording : Ctrl+Shift+R -->
+        <action
+                id="Shotify.StartRecording"
+                class="com.streamify.shotify.actions.StartRecordingAction"
+                text="Start Recording"
+                description="Start Android screen recording via ADB">
+            <add-to-group group-id="Shotify.ActionGroup" anchor="first"/>
+            <keyboard-shortcut
+                    keymap="$default"
+                    first-keystroke="ctrl shift R"/>
+        </action>
+
+        <!-- Stop Recording : Ctrl+Shift+T -->
+        <action
+                id="Shotify.StopRecording"
+                class="com.streamify.shotify.actions.StopRecordingAction"
+                text="Stop Recording &amp; Upload"
+                description="Stop screen recording and upload the video">
+            <add-to-group group-id="Shotify.ActionGroup" anchor="after"
+                          relative-to-action="Shotify.StartRecording"/>
+            <keyboard-shortcut
+                    keymap="$default"
+                    first-keystroke="ctrl shift T"/>
+        </action>
+
+        <!-- Screenshot : Ctrl+Shift+S -->
+        <action
+                id="Shotify.TakeScreenshot"
+                class="com.streamify.shotify.actions.TakeScreenshotAction"
+                text="Take Screenshot &amp; Upload"
+                description="Capture Android screen and upload it">
+            <add-to-group group-id="Shotify.ActionGroup" anchor="last"/>
+            <keyboard-shortcut
+                    keymap="$default"
+                    first-keystroke="ctrl shift S"/>
+        </action>
+
+    </actions>
+
+</idea-plugin>
